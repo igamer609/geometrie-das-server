@@ -1,0 +1,42 @@
+version: "5.0"
+
+services:
+  api:
+    image: node:24-alpine
+    restart: always
+    working_dir: /api
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./api:/api
+    command: sh -c "npm install && npm start"
+    ports:
+      - 127.0.0.1:${PORT}:${PORT}
+    environment:
+      MYSQL_HOST: db
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASS: ${MYSQL_PASS}
+      PORT: ${PORT}
+  
+  db:
+    image: mysql:9
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASS}
+      MYSQL_DATABASE: ${MYSQL_DB}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "-u", "root", "-p=${MYSQL_PASS}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - 3306:3306
+    volumes:
+      - database:/var/lib/mysql
+      - ./api/sql/init:/docker-entrypoint-initdb.d
+  
+volumes:
+  database:
+
+      
