@@ -1,6 +1,10 @@
-import * as mysql from "mysql2"
+// ----------------------------------------------------------
+//	Copyright (c) 2026 igamer609 and Contributors
+//	Licensed under the GNU AGPL v3 License.
+//	See the LICENSE file in the project root for full license information
+// ----------------------------------------------------------
 
-console.log(process.env)
+import * as mysql from "mysql2"
 
 const db = await mysql.createPool({
     host: process.env.MYSQL_HOST,

@@ -4,7 +4,7 @@ USE geometrie_das;
 CREATE TABLE IF NOT EXISTS users (
     id              INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(100) NOT NULL,
-    udid            VARCHAR(128) NOT NULL,
+    pass            VARCHAR(128) NOT NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

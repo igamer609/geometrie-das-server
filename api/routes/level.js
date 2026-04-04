@@ -1,11 +1,11 @@
 // ----------------------------------------------------------
 //	Copyright (c) 2026 igamer609 and Contributors
-//	Licensed under the AGPL v3 License.
+//	Licensed under the GNU AGPL v3 License.
 //	See the LICENSE file in the project root for full license information
 // ----------------------------------------------------------
 
-import express from "express"
-import db from "../db/database.js"
+const express = require(express)
+const db = require("../db/database")
 const route = express.Router()
 
 route.get("/", (req, res, next) => {
@@ -16,7 +16,6 @@ route.get("/", (req, res, next) => {
     }).catch((err) => {
         next(err)
     })
-
     
 })
 
