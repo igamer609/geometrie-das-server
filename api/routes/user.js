@@ -14,7 +14,7 @@ const { userSignUpCheck } = require("../db/validSchemas")
 
 const route = express.Router()
 
-route.post("/auth", userSignUpCheck ,(req, res, next) => {
+route.post("/auth", userSignUpCheck , (req, res, next) => {
     
     const errors = validationResult(req)
 
@@ -27,10 +27,28 @@ route.post("/auth", userSignUpCheck ,(req, res, next) => {
 
     const username = req.body.username
     const password = req.body.password
-    bcrypt.hash(password, 10).then((hash) => {
-        db.query()
+
+    console.log(username, password)
+
+    const hashed = bcrypt.hash(password, 10).then((hash) => {
+        
+        db.query('INSERT INTO users SET ?', {name: username, pass: hash}).then((result, fields) => {
+
+            const token = createToken(username, result[0].insertId)
+
+            console.log(token)
+            
+            res.status(201).json({
+                "success": true,
+                "id": result[0].insertId,
+                "token": token
+            })
+        }).catch((err) => {
+            next(err)
+        })
+
     })
 
 })
 
-export default route
+module.exports = route

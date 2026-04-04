@@ -5,6 +5,7 @@
 // ----------------------------------------------------------
 
 const express = require("express")
+const bcrypt = require("bcrypt")
 const app = express()
 
 const port = process.env.PORT;
@@ -12,6 +13,8 @@ const port = process.env.PORT;
 const level = require("./routes/level.js")
 const user = require("./routes/user.js")
 const social = require("./routes/social.js")
+
+bcrypt.genSalt
 
 app.use(express.json())
 
