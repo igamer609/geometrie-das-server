@@ -2,6 +2,7 @@
   "name": "geometrie-das-api",
   "version": "0.0.1",
   "description": "An API that communicates with a Geometrie Das client. Can be self-hosted to create private servers.",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "dev": "node index.js",

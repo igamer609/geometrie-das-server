@@ -4,7 +4,7 @@
 //	See the LICENSE file in the project root for full license information
 // ----------------------------------------------------------
 
-const express = require(express)
+const express = require("express")
 const db = require("../db/database")
 const route = express.Router()
 
@@ -19,4 +19,4 @@ route.get("/", (req, res, next) => {
     
 })
 
-export default route
+module.exports = route

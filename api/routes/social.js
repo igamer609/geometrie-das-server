@@ -12,4 +12,4 @@ route.get("/", (req, res) => {
     res.send("Social")
 })
 
-export default route
+module.exports = route

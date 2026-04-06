@@ -19,12 +19,12 @@
     </head>
     <body>
         <p>SIGN UP FOR A GEOMETRIE DAS ACCOUNT AND START PUBLISHING LEVELS TODAY!</p>
-        <form action="localhost:3000/user/auth/signup" method="post">
-            <label for="user">Username</label>
-            <input type="text" name="user" maxlength="25" minlenght="3" require>
+        <form action="http://localhost:3000/users/auth/signup" method="post">
+            <label for="username">Username</label>
+            <input type="text" name="username" maxlength="25" minlenght="3" require>
             <br><br>
-            <label for="pass">Password</label>
-            <input type="text" name="pass" maxlength="25" minlenght="3" require>
+            <label for="password">Password</label>
+            <input type="password" name="password" maxlength="25" minlenght="3" require>
             <br><br>
             <input id="sign" type="submit" value="Sign Up">
         </form>
