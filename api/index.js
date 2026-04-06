@@ -24,11 +24,16 @@ app.use("/users", user)
 
 app.use((err, req, res, next) => {
     console.log(err.stack)
-    res.status(500).send("Internal server error.")
+    res.status(500).json({
+        "success": false,
+        "error": {
+            "msg": err.message
+        }
+    })
 })
 
 app.get('/', (req, res) => {
-    res.status(200).send("<h1>Welcome to Geometrie Das!</h1><p>Running version 0.0.1a of the Geometrie Das API.</p>")
+    res.status(200).send(`<h1>Welcome to Geometrie Das!</h1><p>Running version 0.0.1a of the Geometrie Das API.</p>`)
 });
 
 app.listen(port, () => {
