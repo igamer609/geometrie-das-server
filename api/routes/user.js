@@ -33,13 +33,13 @@ route.post("/auth/signup", userRegisterCheck , (req, res, next) => {
 
     const hashed = bcrypt.hash(password, 10).then((hash) => {
         
-        db.query('INSERT INTO users SET ?', {name: username, pass: hash}).then(([rows, fields]) => {
+        db.query('INSERT INTO users SET ?', {name: username, pass: hash}).then(([row, fields]) => {
 
-            const token = createToken(username, rows[0].insertId)
+            const token = createToken(username, row.insertId)
             
             res.status(201).json({
                 "success": true,
-                "id": rows[0].insertId,
+                "id": row.insertId,
                 "token": token
             })
 
@@ -52,6 +52,8 @@ route.post("/auth/signup", userRegisterCheck , (req, res, next) => {
             next(err)
         })
 
+    }).catch((err) => {
+        next(err)
     })
 
 })

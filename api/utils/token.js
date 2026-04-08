@@ -25,7 +25,7 @@ function parseToken(req, res, next) {
 
     if(!token){
 
-        res.status(401).json({
+        return res.status(401).json({
             "success": false,
             "error": {"msg": "No or malformed token provided."}
         })
@@ -46,7 +46,7 @@ function parseToken(req, res, next) {
         })
     } catch (error) {
 
-        res.status(403).json({
+        return res.status(403).json({
             "success": false,
             "error": {"msg": "Token is invalid. Authenticate again."}
         })

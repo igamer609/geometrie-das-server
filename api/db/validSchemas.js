@@ -6,6 +6,7 @@
 
 const { checkSchema } = require("express-validator")
 const semverGte = require("semver/functions/gte")
+const semverValid = require("semver/functions/valid")
 
 const MIN_GAME_VERSION = process.env.MIN_GAME_VERSION || "2.0.0-beta.6"
 
@@ -43,48 +44,50 @@ const levelUploadCheck = checkSchema({
         custom: {
             options: (title) => {
                 title.replace(/\s/g, " ")
+                if (!/^[a-zA-Z0-9 ]+$/.test(title)) {
+                    throw new Error("Title must only contain alphanumeric characters and spaces.");
+                }
+                return true;
             }
         },
-        isAlphanumeric: {
-            options: ["en-US"],
-            errorMessage: "Username must only contain alphanumerical characters.",
-        },
         isLength: {
-            options: {min: 3, max: 25},
-            errorMessage: "Username must be between 3 and 32 characters long.",
+            options: {min: 1, max: 25},
+            errorMessage: "Title must be between 1 and 32 characters long.",
         },
         escape: true,
     },
     description: {
+        optional: true,
         escape: true,
     },
     song_id: {
         isInt: true,
     },
     rate_req: {
+        optional: true,
         isInt: {
             options: {min: 0, max: 10}
         },
     },
     original_id: {
+        optional: true,
         isInt: {
             options: {min: -1}
         },
     },
     version: {
-        isEmpty: true,
-        isSemVer: {
-            options: {
-                includePrerelease: true,
-                errorMessage: `Use a valid version format, e.g. 2.0.0 or ${MIN_GAME_VERSION}`,
-            },
-            custom: {
-                options: (version) => {
-                    if(semverGte(version, MIN_GAME_VERSION) == true){
-                        throw new Error(`Game version must greater or equal to ${MIN_GAME_VERSION}.`)
-                    }
-                    return true
-                },
+        custom: {
+            options: (version) => {
+
+                if(semverValid(version) == null){
+                    throw new Error('Invalid version format.')
+                }
+
+                if(semverGte(version, MIN_GAME_VERSION) == false){
+                    throw new Error(`Game version must greater or equal to ${MIN_GAME_VERSION}.`)
+                }
+
+                return true
             },
         },
     },
@@ -99,4 +102,6 @@ const levelUploadCheck = checkSchema({
 
 })
 
-module.exports = { userSignUpCheck }
+
+
+module.exports = { userRegisterCheck, levelUploadCheck }

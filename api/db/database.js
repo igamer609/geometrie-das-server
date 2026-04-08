@@ -11,7 +11,7 @@ const db = mysql.createPool({
     port: 3306,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASS,
-    database: "geometrie_das",
+    database: process.env.MYSQL_DB,
     connectionLimit: 20,
 }).promise()
 
