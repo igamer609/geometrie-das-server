@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE TABLE IF NOT EXISTS levels (
     id INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
     original_id INT NOT NULL DEFAULT -1,
@@ -34,4 +33,13 @@ CREATE TABLE IF NOT EXISTS levels (
 
     INDEX (id),
     INDEX (title)
+);
+
+CREATE TABLE IF NOT EXISTS level_ratings (
+    id INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    level_id INT unsigned NOT NULL,
+    user_id INT unsigned NOT NULL,
+    rating INT NOT NULL,
+    
+    UNIQUE KEY unique_rating (level_id, user_id)
 );

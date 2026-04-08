@@ -8,9 +8,8 @@ const express = require("express")
 const db = require("../db/database")
 const bcrypt = require("bcrypt")
 const { createToken, parseToken } = require("../utils/token")
-
 const { validationResult } = require("express-validator")
-const { userSignUpCheck } = require("../db/validSchemas")
+const { userRegisterCheck } = require("../db/validSchemas")
 
 const route = express.Router()
 
@@ -18,7 +17,7 @@ route.get("/auth/signup", (req, res, next) => {
     res.status(200).sendFile("/api/web/signup.html")
 })
 
-route.post("/auth/signup", userSignUpCheck , (req, res, next) => {
+route.post("/auth/signup", userRegisterCheck , (req, res, next) => {
     
     const errors = validationResult(req)
 
@@ -57,7 +56,7 @@ route.post("/auth/signup", userSignUpCheck , (req, res, next) => {
 
 })
 
-route.post("/auth/signin", userSignUpCheck, (req, res, next) => {
+route.post("/auth/signin", userRegisterCheck, (req, res, next) => {
 
     const errors = validationResult(req)
 

@@ -39,6 +39,7 @@ function parseToken(req, res, next) {
                 next(err)
             }
 
+            req.username = decoded.name
             req.user_id = decoded.id
             next()
 
