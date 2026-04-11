@@ -5,7 +5,13 @@ CREATE TABLE IF NOT EXISTS users (
     id              INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name            VARCHAR(32) UNIQUE NOT NULL,
     pass            VARCHAR(128) NOT NULL,
+    permissions     INT unsigned DEFAULT 0,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS permissions (
+    id              INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name            VARCHAR(32) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS levels (
@@ -62,9 +68,12 @@ CREATE TABLE IF NOT EXISTS comments (
     id              INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
     level_id        INT unsigned DEFAULT NULL,
     user_id         INT unsigned NOT NULL,
+    user_name       VARCHAR(32) NOT NULL,
     scope           ENUM('level', 'user') NOT NULL,
     content         TEXT NOT NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (level_id) REFERENCES levels (id) ON DELETE CASCADE
 );
+
+INSERT INTO roles name VALUES ('player'), ('moderator'), ('developer');

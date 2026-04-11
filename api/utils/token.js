@@ -6,10 +6,11 @@
 
 const jwt = require("jsonwebtoken")
 
-function createToken(name, id){
+function createToken(name, id, permission_level = 0){
     
     const payload = {
         name: name,
+        permission_level: permission_level,
         id: id
     }
 
@@ -41,6 +42,11 @@ function parseToken(req, res, next) {
 
             req.username = decoded.name
             req.user_id = decoded.id
+
+            if(decoded.permission_level){
+                req.permission_level = decoded.permission_level
+            }
+
             next()
 
         })

@@ -39,6 +39,7 @@ route.post("/auth/signup", userRegisterCheck , (req, res, next) => {
             
             res.status(201).json({
                 "success": true,
+                "username": username,
                 "id": row.insertId,
                 "token": token
             })
@@ -72,7 +73,7 @@ route.post("/auth/signin", userRegisterCheck, (req, res, next) => {
     const username = req.body.username
     const password = req.body.password
 
-    db.query("SELECT id, pass FROM users WHERE name = ?", [username]).then(([rows, fields]) => {
+    db.query("SELECT id, pass, permissions FROM users WHERE name = ?", [username]).then(([rows, fields]) => {
 
         if(rows.length == 0){
             return res.status(404).send("No account with that username was found.")
@@ -85,6 +86,7 @@ route.post("/auth/signin", userRegisterCheck, (req, res, next) => {
             
                 res.status(201).json({
                     "success": true,
+                    "username" : username,
                     "id": rows[0].id,
                     "token": token
                 })

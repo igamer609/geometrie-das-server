@@ -1,15 +1,17 @@
-import { describe, it, expect, beforeAll } from "vitest"
+import { describe, it, expect, beforeAll, afterAll } from "vitest"
 import { faker } from "@faker-js/faker"
 import request from "supertest"
-import app from "../index.js"
+import { app, db } from "../index.js"
 
 const randomUsername = faker.internet.username().replace(/[^a-zA-Z0-9]/g, "")
 const randomPassword = faker.internet.password({length: 12})
 
-console.log(randomUsername, randomPassword)
-
 // user authentication testing
 describe("User Authentication", () => {
+
+  beforeAll(async () => {
+    db.query("START TRANSACTION")
+  })
 
   it("Sign up a new user", async () => {
 	  const response = await request(app)
@@ -19,10 +21,11 @@ describe("User Authentication", () => {
 		    password: randomPassword,
 	  }) 
 
-	expect(response.status).toBe(201) 
-	expect(response.body.success).toBe(true) 
-	expect(response.body).toHaveProperty("id") 
-	expect(response.body).toHaveProperty("token") 
+	  expect(response.status).toBe(201) 
+	  expect(response.body.success).toBe(true) 
+	  expect(response.body).toHaveProperty("id") 
+	  expect(response.body).toHaveProperty("token") 
+
   }) 
 
   it("Test for duplication error", async () => {
@@ -33,8 +36,8 @@ describe("User Authentication", () => {
 		password: randomPassword,
 	  }) 
 
-	expect(response.status).toBe(409) 
-	expect(response.text).toBe("Username is already taken. Please use another one.") 
+	  expect(response.status).toBe(409) 
+	  expect(response.text).toBe("Username is already taken. Please use another one.") 
   }) 
 
   it("Sign in and return existing user", async () => {
@@ -61,7 +64,9 @@ describe("User Authentication", () => {
   
     expect(response.status).toBe(404) 
     expect(response.text).toBe("No account with that username was found.") 
-  }) 
+  })
+
+  
 
 }) 
 
@@ -78,7 +83,11 @@ describe("Level Management", () => {
         }) 
   
       token = response.body.token 
-    }) 
+    })
+
+    afterAll(async () => {
+      db.query("ROLLBACK")
+    })
   
     it("Create new level", async () => {
       const response = await request(app)
@@ -125,7 +134,7 @@ describe("Level Management", () => {
          level_data: "eyJoZWxsbyI6ICJ5YWhoaCEhIiwgInNvbmltY3JpbmUiOiAidGhlIHN1biBpcyBsZWFraW5nIn0=",
       }) 
   
-     const levelId = createResponse.body.id 
+      const levelId = createResponse.body.id 
   
       const deleteResponse = await request(app)
         .delete(`/levels/${levelId}`)

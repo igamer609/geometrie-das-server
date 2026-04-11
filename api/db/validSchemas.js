@@ -100,8 +100,31 @@ const levelUploadCheck = checkSchema({
         },
     }
 
-})
+}, ["body"])
 
+const commentCheck = checkSchema({
+    content: {
+        isLength: {
+            options: {min: 1, max: 250},
+            errorMessage: "Comment must be between 1 and 250 characters long.",
+        },
+        escape: true,
+    },
+    scope: {
+        isIn: {
+            options: [["level", "comment"]],
+            errorMessage: "Invalid comment scope. Must be either 'level' or 'comment'.",
+        },
+    }
+}, ["body"])
 
+const ratingCheck = checkSchema({
+    rating: {
+        isInt: {
+            options: {min: 0, max: 10},
+            errorMessage: "Rating must be an integer between 0 and 10.",
+        },
+    },
+}, ["body"])
 
-module.exports = { userRegisterCheck, levelUploadCheck }
+module.exports = { userRegisterCheck, levelUploadCheck, commentCheck, ratingCheck }
