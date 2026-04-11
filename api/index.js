@@ -6,6 +6,7 @@
 
 const express = require("express")
 const bcrypt = require("bcrypt")
+const db = require("./db/database.js")
 const app = express()
 
 const port = process.env.PORT;
@@ -13,8 +14,6 @@ const port = process.env.PORT;
 const level = require("./routes/level.js")
 const user = require("./routes/user.js")
 const social = require("./routes/social.js")
-
-bcrypt.genSalt
 
 app.use(express.json())
 
@@ -39,3 +38,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Geometrie Das Server API, up and running on port ${port}.`)
 });
+
+module.exports = { app, db }

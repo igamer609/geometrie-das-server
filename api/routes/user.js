@@ -8,9 +8,8 @@ const express = require("express")
 const db = require("../db/database")
 const bcrypt = require("bcrypt")
 const { createToken, parseToken } = require("../utils/token")
-
 const { validationResult } = require("express-validator")
-const { userSignUpCheck } = require("../db/validSchemas")
+const { userRegisterCheck } = require("../db/validSchemas")
 
 const route = express.Router()
 
@@ -18,7 +17,7 @@ route.get("/auth/signup", (req, res, next) => {
     res.status(200).sendFile("/api/web/signup.html")
 })
 
-route.post("/auth/signup", userSignUpCheck , (req, res, next) => {
+route.post("/auth/signup", userRegisterCheck , (req, res, next) => {
     
     const errors = validationResult(req)
 
@@ -34,13 +33,14 @@ route.post("/auth/signup", userSignUpCheck , (req, res, next) => {
 
     const hashed = bcrypt.hash(password, 10).then((hash) => {
         
-        db.query('INSERT INTO users SET ?', {name: username, pass: hash}).then(([rows, fields]) => {
+        db.query('INSERT INTO users SET ?', {name: username, pass: hash}).then(([row, fields]) => {
 
-            const token = createToken(username, rows[0].insertId)
+            const token = createToken(username, row.insertId)
             
             res.status(201).json({
                 "success": true,
-                "id": rows[0].insertId,
+                "username": username,
+                "id": row.insertId,
                 "token": token
             })
 
@@ -53,11 +53,13 @@ route.post("/auth/signup", userSignUpCheck , (req, res, next) => {
             next(err)
         })
 
+    }).catch((err) => {
+        next(err)
     })
 
 })
 
-route.post("/auth/signin", userSignUpCheck, (req, res, next) => {
+route.post("/auth/signin", userRegisterCheck, (req, res, next) => {
 
     const errors = validationResult(req)
 
@@ -71,7 +73,7 @@ route.post("/auth/signin", userSignUpCheck, (req, res, next) => {
     const username = req.body.username
     const password = req.body.password
 
-    db.query("SELECT id, pass FROM users WHERE name = ?", [username]).then(([rows, fields]) => {
+    db.query("SELECT id, pass, permissions FROM users WHERE name = ?", [username]).then(([rows, fields]) => {
 
         if(rows.length == 0){
             return res.status(404).send("No account with that username was found.")
@@ -84,6 +86,7 @@ route.post("/auth/signin", userSignUpCheck, (req, res, next) => {
             
                 res.status(201).json({
                     "success": true,
+                    "username" : username,
                     "id": rows[0].id,
                     "token": token
                 })

@@ -6,10 +6,11 @@
 
 const jwt = require("jsonwebtoken")
 
-function createToken(name, id){
+function createToken(name, id, permission_level = 0){
     
     const payload = {
         name: name,
+        permission_level: permission_level,
         id: id
     }
 
@@ -25,7 +26,7 @@ function parseToken(req, res, next) {
 
     if(!token){
 
-        res.status(401).json({
+        return res.status(401).json({
             "success": false,
             "error": {"msg": "No or malformed token provided."}
         })
@@ -39,13 +40,19 @@ function parseToken(req, res, next) {
                 next(err)
             }
 
+            req.username = decoded.name
             req.user_id = decoded.id
+
+            if(decoded.permission_level){
+                req.permission_level = decoded.permission_level
+            }
+
             next()
 
         })
     } catch (error) {
 
-        res.status(403).json({
+        return res.status(403).json({
             "success": false,
             "error": {"msg": "Token is invalid. Authenticate again."}
         })

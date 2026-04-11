@@ -1,0 +1,7 @@
+## v0.2.0
+- Added level management
+- Added tests using `vitest`
+- Changed a few properties in `docker-compose.yaml`
+- Added tables for social features in `init.sql`
+- Changed `levelUploadCheck` validation schema to support optional values and fixed the `version` check (it was wrong)
+- Added all necessary environment values to `README.md`
