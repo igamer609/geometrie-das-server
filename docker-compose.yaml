@@ -1,16 +1,19 @@
 services:
   api:
-    image: node:24-alpine
     restart: 'no'
-    working_dir: /api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+        if [ \"$${RUN_TESTS_ON_START}\" = \"true\" ]; then
+          npm test;
+        fi;
+        npm start
+      "
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./api:/api
-    command: sh -c "npm install && npm test && npm start"
-    ports:
-      - 127.0.0.1:${PORT}:${PORT}
     environment:
       MYSQL_HOST: db
       MYSQL_USER: ${MYSQL_USER}
@@ -21,6 +24,7 @@ services:
 
       PORT: ${PORT}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      RUN_TESTS_ON_START: ${RUN_TESTS_ON_START:-false}
   
   db:
     image: mysql:9

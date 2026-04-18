@@ -14,6 +14,11 @@ CREATE TABLE IF NOT EXISTS permissions (
     name            VARCHAR(32) UNIQUE NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS level_id_allocator (
+    id              TINYINT unsigned NOT NULL PRIMARY KEY,
+    next_level_id   INT unsigned NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS levels (
     id              INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
     original_id     INT NOT NULL DEFAULT -1,
@@ -76,4 +81,24 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (level_id) REFERENCES levels (id) ON DELETE CASCADE
 );
 
-INSERT INTO roles name VALUES ('player'), ('moderator'), ('developer');
+INSERT INTO permissions (name) VALUES ('player'), ('moderator'), ('developer');
+
+INSERT INTO level_id_allocator (id, next_level_id)
+VALUES (1, 128)
+ON DUPLICATE KEY UPDATE next_level_id = VALUES(next_level_id);
+
+CREATE VIEW level_avg_ratings AS
+SELECT level_id, IFNULL(AVG(rating), 0) AS avg_rating
+FROM level_ratings
+GROUP BY level_id;
+
+DELIMITER $$
+CREATE TRIGGER update_avg_rating_after_insert
+AFTER INSERT ON level_ratings
+FOR EACH ROW
+BEGIN
+    UPDATE levels
+    SET avg_rating = (SELECT IFNULL(AVG(rating), 0) FROM level_ratings WHERE level_id = NEW.level_id)
+    WHERE id = NEW.level_id;
+END$$
+DELIMITER ;
