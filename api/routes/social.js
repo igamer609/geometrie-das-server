@@ -10,16 +10,19 @@ const route = express.Router()
 const { parseToken } = require("../utils/token")
 const { requirePermissionLevel } = require("../utils/requirePermissionLevel")
 const { commentCheck, ratingCheck } = require("../db/validSchemas")
-const { body, params, validationResult } = require("express-validator")
+const { body, param, validationResult } = require("express-validator")
 
 route.get("/", (req, res) => {
     res.send("Social")
 })
 
-route.get("rate/:level_id", params("level_id").isInt({min: 0}) ,(req, res, next) => {
+route.post("/rate/:level_id", [ratingCheck, parseToken] ,(req, res, next) => {
     const errors = validationResult(req)
 
     if(!errors.isEmpty()){
+
+        console.log(errors.array())
+
         return res.status(400).json({
             "success": false,
             "errors": errors.array(),
@@ -28,10 +31,8 @@ route.get("rate/:level_id", params("level_id").isInt({min: 0}) ,(req, res, next)
 
     const level_id = parseInt(req.params.level_id)
 
-    db.query("INSERT INTO level_ratings SET ?", {level_id: level_id, user_id: req.user_id})
+    db.query("INSERT INTO level_ratings SET ?", {level_id: level_id, user_id: req.user_id, rating: req.body.rating})
     .then(([rows, fields]) => {
-
-        
         res.status(200).json({
             "success": true,
         })
@@ -53,8 +54,6 @@ route.post("/comment", [commentCheck, parseToken], (req, res, next) => {
     const level_id = req.body.level_id
     const content = req.body.content
     const scope = req.body.scope
-    const user_id = req.user_id
-    const user_name = req.username
 
     db.query("INSERT INTO comments SET ?", {
         level_id: level_id, content: content, scope: scope, 

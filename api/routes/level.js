@@ -11,6 +11,30 @@ const { parseToken } = require("../utils/token")
 const { levelUploadCheck } = require("../db/validSchemas")
 const { body, validationResult } = require("express-validator")
 
+const reservedLevelRanges = [
+    { start: 0, end: 127 },
+    { start: 10000, end: 10999 }
+]
+
+const getNextAvailableLevelId = (startId) => {
+    let nextId = startId
+    let updated = true
+
+    while (updated) {
+        updated = false
+
+        for (const range of reservedLevelRanges) {
+            if (nextId >= range.start && nextId <= range.end) {
+                nextId = range.end + 1
+                updated = true
+                break
+            }
+        }
+    }
+
+    return nextId
+}
+
 route.get("/",
     body("page").isInt({ min: 0 }),
     body("page_size").isInt({ min: 1, max: 25 }),
@@ -67,21 +91,50 @@ route.post("/", [levelUploadCheck, parseToken], (req, res, next) => {
     const author_name = req.username
     const author_id = req.user_id
 
-    db.query("INSERT INTO levels SET ?", {
-        title: req.body.title,
-        description: req.body.description,
-        author_name: author_name,
-        author_id: author_id,
-        song_id: req.body.song_id,
-        length: req.body.length,
-        version: req.body.version,
-        original_id: req.body.original_id || -1,
-        level_data: req.body.level_data
-    }).then(([row, fields]) => {
-        res.status(201).json({
-            "success": true,
-            "id": row.insertId
-        })
+    // A little weird but should handle concurrency issues :3
+    db.getConnection().then((connection) => {
+        return connection.beginTransaction()
+            .then(() => connection.query(
+                "SELECT next_level_id FROM level_id_allocator WHERE id = 1 FOR UPDATE"
+            ))
+            .then(([[{ next_level_id }]]) => {
+                const level_id = getNextAvailableLevelId(next_level_id)
+
+                return connection.query(
+                    "UPDATE level_id_allocator SET next_level_id = ? WHERE id = 1",
+                    [level_id + 1]
+                ).then(() => level_id)
+            })
+            .then((level_id) => {
+                return connection.query("INSERT INTO levels SET ?", {
+                    id: level_id,
+                    title: req.body.title,
+                    description: req.body.description,
+                    author_name: author_name,
+                    author_id: author_id,
+                    song_id: req.body.song_id,
+                    length: req.body.length,
+                    version: req.body.version,
+                    original_id: req.body.original_id || -1,
+                    level_data: req.body.level_data
+                }).then(() => level_id)
+            })
+            .then((level_id) => {
+                return connection.commit().then(() => {
+                    res.status(201).json({
+                        "success": true,
+                        "id": level_id
+                    })
+                })
+            })
+            .catch((err) => {
+                return connection.rollback().then(() => {
+                    throw err
+                })
+            })
+            .finally(() => {
+                connection.release()
+            })
     }).catch((err) => {
         next(err)
     })

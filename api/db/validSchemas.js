@@ -125,6 +125,13 @@ const ratingCheck = checkSchema({
             errorMessage: "Rating must be an integer between 0 and 10.",
         },
     },
-}, ["body"])
+    level_id: {
+        in: ["param"],
+        isInt: {
+            options: {min: 0},
+            errorMessage: "Invalid level ID.",
+        },
+    }
+}, ["body", "param"])
 
 module.exports = { userRegisterCheck, levelUploadCheck, commentCheck, ratingCheck }

@@ -1,7 +1,6 @@
-FROM node:24-alpine
+FROM node:22-alpine3.21
 
 WORKDIR /api
 COPY package.json .
 RUN npm install
 COPY . .
-CMD ["npm", "test", "&&", "npm", "start"]
